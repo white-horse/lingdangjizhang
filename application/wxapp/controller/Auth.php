@@ -12,21 +12,8 @@ use think\Config;
 
 class Auth
 {   
-    /**@var 授权获取openid的微信地址，code换取  */
-    private const OPENID_URL = 'https://api.weixin.qq.com/sns/jscode2session?';
-    
-    /**@var 小程序配置  */
-    private static $appId;
-    private static $appSecret;
-    
     /**@var 接口返回数据  */
     private static $output = ['errcode' => 200, 'errmsg' => 'success', 'data' => []];
-    
-    public function __construct()
-    {
-        self::$appId = Config::get('wxapp.app_id');
-        self::$appSecret = Config::get('wxapp.app_secret');
-    }
     
     /**
      * 获取openid
@@ -36,8 +23,9 @@ class Auth
         
         $code = $request->param('code', '');
         if ($code) {
-            $url = self::OPENID_URL.'appid='.self::$appId.'&secret='.self::$appSecret
-                        .'&js_code='.$code.'&grant_type=authorization_code';
+            $url = Config::get('wxapp.get_openid_url').'appid='.Config::get('wxapp.app_id').'&secret='
+                   .Config::get('wxapp.app_secret').'&js_code='.$code.'&grant_type=authorization_code';
+            
             $res = json_decode(curl_get($url), true);
             if (isset($res['openid'])) {
                 self::$output['data']['openid'] = $res['openid'];

@@ -5,7 +5,8 @@ return [
     // 小程序配置段
     'wxapp' => [
         'app_id' => 'wxb77a3196812143b2',
-        'app_secret' => '4b44207e3c126a2af517cf76db510c07'
+        'app_secret' => '4b44207e3c126a2af517cf76db510c07',
+        'get_openid_url' => 'https://api.weixin.qq.com/sns/jscode2session',
     ],
     
     // 数据库配置段
@@ -21,7 +22,7 @@ return [
         // 密码
         'password'        => '',
         // 端口
-        'hostport'        => '',
+        'hostport'        => '3306',
         // 连接dsn
         'dsn'             => '',
         // 数据库连接参数
