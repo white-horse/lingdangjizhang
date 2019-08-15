@@ -23,12 +23,13 @@ class Auth
         
         $code = $request->param('code', '');
         if ($code) {
-            $url = Config::get('wxapp.get_openid_url').'appid='.Config::get('wxapp.app_id').'&secret='
+            $url = Config::get('wxapp.get_openid_url').'?appid='.Config::get('wxapp.app_id').'&secret='
                    .Config::get('wxapp.app_secret').'&js_code='.$code.'&grant_type=authorization_code';
             
             $res = json_decode(curl_get($url), true);
             if (isset($res['openid'])) {
                 self::$output['data']['openid'] = $res['openid'];
+                self::$output['data']['session_key'] = $res['session_key'];
             } else {
                 self::$output['errcode'] = $res['errcode'];
                 self::$output['errmsg'] = $res['errmsg'];
