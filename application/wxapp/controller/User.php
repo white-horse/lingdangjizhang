@@ -6,13 +6,13 @@
  */
 namespace app\wxapp\controller;
 
-use think\Config;
-use app\wxapp\model\UserAccount;
+//use think\Config;
 
 class User extends Base
 {
-    /**@var object UserAccount */
-    protected static $userAccount = null;
+    /** 性别定义  */
+    protected static $gender = [0,1,2];
+    
     
     /**
      * 维护用户信息
@@ -20,12 +20,35 @@ class User extends Base
      * @return boolean true | false
      */
     public function saveInfo()
-    {   
+    {
         // 参数校验
+        $mobile_phone = $this->request->param('mobile_phone');
+        if (!empty($mobile_phone) && !check_mobile_no($mobile_phone)) {
+            return $this->outputData(301, 'mobile_phone param error');
+        }
         
-        $useraccount = new UserAccount();
-        $data[] = $useraccount->setUser();
-        return $this->outputData(200, 'success', $data);
+        $gender = $this->request->param('gender', null);
+        if ($gender !== null && !in_array($gender, self::$gender) ) {
+            return $this->outputData(301, 'param error');
+        }
+        
+       $infoData = [
+            'openid' => $this->openid,
+            'mobile_phone' => $mobile_phone,
+            'gender' => $gender,
+            'nickname' => $this->request->param('nickname'),
+            'avatar_url' => $this->request->param('avatar_url'),
+            'country' => $this->request->param('country'),
+            'province' => $this->request->param('province'),
+            'city' => $this->request->param('city'),
+            'language' => $this->request->param('language'),
+        ];
+        
+       $result['result'] = false;
+       if ($this->userAccountEntity->setUser($infoData) !== false) {
+           $result['result'] = true;
+       }
+        return $this->outputData(200, 'success', $result);
     }
     
     /**
@@ -33,7 +56,7 @@ class User extends Base
      */
     protected function init()
     {
-        self::$userAccount = new UserAccount();
+        
     }
     
 }

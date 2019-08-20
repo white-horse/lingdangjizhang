@@ -11,9 +11,28 @@
 
 // 应用公共文件
 /**
+ * 校验手机号格式
+ * @param string $phone_no
+ * @return boolean $result
+ */
+function check_mobile_no(string $mobile_no='')
+{
+    if (empty($mobile_no)) {
+        return false;
+    }
+    
+    if(preg_match('/^1[3|5|7|8|9]{1}\d{9}$/', $mobile_no)){
+        return true;
+    }
+    
+    return false;
+}
+
+
+/**
  * curl的get请求 
  */
-function curl_get($url)
+function curl_get(string $url)
 {
     $ch = curl_init();
     $header = "Accept-Charset: utf-8";
@@ -33,7 +52,7 @@ function curl_get($url)
 /**
  *  curl 的post 请求 
  */
-function curl_post($url, $params=[])
+function curl_post(string $url, $params=[])
 {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);

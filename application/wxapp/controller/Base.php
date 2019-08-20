@@ -7,17 +7,20 @@
 namespace app\wxapp\controller;
 
 use think\Request;
+use app\wxapp\model\UserAccount;
 
 class Base
 {
     protected const WX_MINI_APP = 'wxapp';
     protected static $userEnv;
+    protected $userAccountEntity = null;
+    protected $openid = '';
     protected $userInfo = [];
     protected $request = null;
     
-    public function __construct(Request $request)
+    public function __construct()
     {
-        $this->request = $request;
+        $this->request = Request::instance();
         $this->init();
         
         // 验证用户环境
@@ -30,8 +33,20 @@ class Base
             exit(json_encode($this->outputData(301, 'openid error')));
         }
         
-        $this->userInfo['openid'] = $this->request->param('openid');
+        $this->openid = $this->request->param('openid');
+         
+    }
+    
+    /** 
+     * 获取用户基本信息
+     * @return array $userInfo
+     */
+    protected function getUserBaseInfo()
+    {   
+        $where = ['openid' => $this->openid];
+        $this->userInfo = $this->userAccountEntity->getUserInfo($where, ['id', 'openid']);
         
+        return $this->userInfo;
     }
     
     /**
@@ -40,6 +55,7 @@ class Base
     private function init()
     {
         self::setUserEnv();
+        $this->userAccountEntity = new UserAccount();
     }
     
     /**
@@ -49,6 +65,17 @@ class Base
     {
         if (true) {
             self::$userEnv = 'wxapp';
+        }
+    }
+    
+    /**
+     * 检测用户，若不存在，直接输出
+     */
+    protected function checkUser()
+    {
+        $this->getUserBaseInfo();
+        if (empty($this->userInfo)) {
+            exit(json_encode($this->outputData(400, 'user error')));
         }
     }
     
@@ -64,5 +91,6 @@ class Base
             'data' => $data
         ];
     }
+    
 
 }

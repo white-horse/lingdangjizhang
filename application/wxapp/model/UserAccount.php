@@ -11,7 +11,7 @@ use think\Model;
 
 class UserAccount extends Model
 {
-    // 主键
+    /**@var string 主键 */
     protected $pk = 'id';
     
     /**
@@ -22,21 +22,25 @@ class UserAccount extends Model
     protected $updateTime = 'update_time';
     
     /** 设置用户账号信息：更新 或 插入  */
-    public function setUser()
+    public function setUser(array $data = [])
     {
-        $this->data = [
-            'openid' => '33333333333',
-        ];
-        
-        $info = $this->where(['openid' => $this->data['openid']])->find();
+        $info = $this->where(['openid' => $data['openid']])->find();
         if (!empty($info)) {
-            return $this->save($this->data, ['id' => $info['id']]);
+            return $this->save($data, ['id' => $info['id']]);
         }else{
-            return $this->save($this->data);
+            return $this->save($data);
         }
     }
     
-    /** 自动完成  */
-//     protected function //
+    /**
+     * 获取用户信息
+     * @param string $openid
+     * @return mixed $userInfo
+     */
+    public function getUserInfo(array $where, $fields = [])
+    {
+        return $this->where($where)->field($fields)->find();
+    }
+    
     
 }
