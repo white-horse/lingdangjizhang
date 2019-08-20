@@ -37,7 +37,7 @@ class UserAccount extends Model
      * @param string $openid
      * @return mixed $userInfo
      */
-    public function getUserInfo(array $where, $fields = [])
+    public function getUserInfo(array $where = [], array $fields = [])
     {
         return $this->where($where)->field($fields)->find();
     }

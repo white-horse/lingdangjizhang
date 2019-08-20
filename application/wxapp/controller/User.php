@@ -27,7 +27,7 @@ class User extends Base
             return $this->outputData(301, 'mobile_phone param error');
         }
         
-        $gender = $this->request->param('gender', null);
+        $gender = $this->request->param('gender');
         if ($gender !== null && !in_array($gender, self::$gender) ) {
             return $this->outputData(301, 'param error');
         }
