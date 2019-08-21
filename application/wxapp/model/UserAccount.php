@@ -24,9 +24,9 @@ class UserAccount extends Model
     /** 设置用户账号信息：更新 或 插入  */
     public function setUser(array $data = [])
     {
-        $info = $this->where(['openid' => $data['openid']])->find();
-        if (!empty($info)) {
-            return $this->save($data, ['id' => $info['id']]);
+        $res = $this->where(['openid' => $data['openid']])->find();
+        if (!empty($res)) {
+            return $this->save($data, ['id' => $res['id']]);
         }else{
             return $this->save($data);
         }
@@ -39,7 +39,12 @@ class UserAccount extends Model
      */
     public function getUserInfo(array $where = [], array $fields = [])
     {
-        return $this->where($where)->field($fields)->find();
+        $res = $this->where($where)->field($fields)->find();
+        if (!empty($res->data)) {
+            return $res->data;
+        }
+        
+        return false;
     }
     
     

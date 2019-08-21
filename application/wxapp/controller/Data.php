@@ -39,9 +39,16 @@ class Data extends Base
             'data_latest_date AS dataLatestDate',
         ];
         
-        return $data = self::$billTotalDataEntity->getOne($where, $fields);
-        if (empty($data)) {
-            $data = ['id'=>0];            
+       $data = self::$billTotalDataEntity->getOne($where, $fields);
+       if (empty($data)) {
+            $data = [
+                'totalIncomeFee' => '0.00',
+                'totalExpenditureFee' => '0.00',
+                'totalBalanceFee' => '0.00',
+                'averageDayExpenditureFee' => '0.00',
+                'dateStartDate' => date('Y-m-d'),
+                'dataLatestDate' => date('Y-m-d')
+            ];
         }
         
         return $this->outputData(200, 'success', $data);

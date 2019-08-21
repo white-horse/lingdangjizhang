@@ -7,11 +7,12 @@
 namespace app\wxapp\model;
 
 use think\Model;
+use think\db;
 
 class BillTotalData extends Model
 {
     /**@var string 主键  */
-    protected $pk = 'id';
+    protected $pk = ['id', 'user_id'];
     
     /**@var strng 时间类型字段，自动完成*/
     protected $autoWriteTimestamp = 'datetime';
@@ -26,6 +27,11 @@ class BillTotalData extends Model
      */
     public function getOne(array $where = [], array $fields = [])
     {
-        return $this->where($where)->field($fields)->find();
+        $res = $this->where($where)->field($fields)->find();
+        if (!empty($res->data)) {
+            return $res->data;
+        }
+        
+        return false;
     }
 }
