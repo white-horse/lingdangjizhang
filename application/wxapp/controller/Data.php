@@ -35,20 +35,20 @@ class Data extends Base
             'income_bill_total_fee AS totalIncomeFee',
             'total_balance_fee AS totalBalanceFee',
             'day_average_expenditure_fee AS averageDayExpenditureFee',
-            'data_start_date AS dateStartDate',
+            'data_start_date AS dataStartDate',
             'data_latest_date AS dataLatestDate',
         ];
         
        $data = self::$billTotalDataEntity->getOne($where, $fields);
        if (empty($data)) {
-            $data = [
-                'totalIncomeFee' => '0.00',
-                'totalExpenditureFee' => '0.00',
-                'totalBalanceFee' => '0.00',
-                'averageDayExpenditureFee' => '0.00',
-                'dateStartDate' => date('Y-m-d'),
-                'dataLatestDate' => date('Y-m-d')
-            ];
+                $data = [
+                    'totalIncomeFee' => '0.00',
+                    'totalExpenditureFee' => '0.00',
+                    'totalBalanceFee' => '0.00',
+                    'averageDayExpenditureFee' => '0.00',
+                    'dataStartDate' => date('Y-m-d'),
+                    'dataLatestDate' => date('Y-m-d')
+                ];
         }
         
         return $this->outputData(200, 'success', $data);
