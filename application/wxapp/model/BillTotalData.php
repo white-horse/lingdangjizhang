@@ -7,12 +7,11 @@
 namespace app\wxapp\model;
 
 use think\Model;
-use think\db;
 
 class BillTotalData extends Model
 {
     /**@var string 主键  */
-    protected $pk = ['id', 'user_id'];
+    protected $pk = 'id';
     
     /**@var strng 时间类型字段，自动完成*/
     protected $autoWriteTimestamp = 'datetime';
@@ -32,6 +31,6 @@ class BillTotalData extends Model
             return $res->data;
         }
         
-        return false;
+        return [];
     }
 }

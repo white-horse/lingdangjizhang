@@ -44,7 +44,7 @@ class UserAccount extends Model
             return $res->data;
         }
         
-        return false;
+        return [];
     }
     
     
