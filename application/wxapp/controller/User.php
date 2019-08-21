@@ -22,7 +22,7 @@ class User extends Base
     public function saveInfo()
     {
         // 参数校验
-        $mobile_phone = $this->request->param('mobile_phone');
+        $mobile_phone = $this->request->param('acctPhone');
         if (!empty($mobile_phone) && !check_mobile_no($mobile_phone)) {
             return $this->outputData(301, 'mobile_phone param error');
         }
@@ -36,8 +36,8 @@ class User extends Base
             'openid' => $this->openid,
             'mobile_phone' => $mobile_phone,
             'gender' => $gender,
-            'nickname' => $this->request->param('nickname'),
-            'avatar_url' => $this->request->param('avatar_url'),
+            'nickname' => $this->request->param('nickName'),
+            'avatar_url' => $this->request->param('avatarUrl'),
             'country' => $this->request->param('country'),
             'province' => $this->request->param('province'),
             'city' => $this->request->param('city'),
