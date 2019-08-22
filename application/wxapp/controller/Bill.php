@@ -39,20 +39,24 @@ class Bill extends Base
 		}
 
 		if (empty($this->request->param('billFee'))) {
-			return $this->outputData(301, '请输入账单金额');
+			return $this->outputData(1000, '请输入账单金额');
 		}
 
 		$create_data = [
 			'user_id' => $this->userInfo['id'],
-			'bill_type' => $this->request->param('billType'),
+		    'bill_type' => self::$billType[$this->request->param('billType')],
 			'bill_amount' => $this->request->param('billFee'),
-			'bill_tag' => $this->request->param('tagTitle'),
+		    'bill_tag' => $this->request->param('tagTitle')?:'其他',
 			'bill_remark' => $this->request->param('billRemark'),
 			'bill_date' => str_replace('-', '', $this->request->param('billDate')),
 		];
 		
-		$res = self::$billItemEntity->addOne($create_data);
-	
+		$result['result'] = false;
+		if (self::$billItemEntity->addBill($create_data) !== false) {
+		    $result['result'] = true;
+		}
+		
+		return $this->outputData(200, 'success', $result);
 	}
     
     /**

@@ -25,7 +25,6 @@ class BillItem extends Model
      */
     public function addBill(array $bill_data)
     {	
-		$this->data = $bill_data;
         return $this->save($bill_data);
     }
 }
