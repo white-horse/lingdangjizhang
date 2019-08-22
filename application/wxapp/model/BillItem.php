@@ -25,7 +25,8 @@ class BillItem extends Model
      * @return boolean $result
      */
     public function addBill(array $bill_data)
-    {	// 开启事务
+    {	
+		// 开启事务
         // 1. 添加账单
         // 2. 维护账单日数据
         // 3. 维护账单月数据
@@ -33,7 +34,7 @@ class BillItem extends Model
         // 5. 维护账单总数据
         // 结束事务
         
-//         Db::startTrans();
+        Db::startTrans();
         try{
             $add_bill_res = $this->save($bill_data);
             
@@ -41,17 +42,19 @@ class BillItem extends Model
             $bill_day_entity->setDayData($bill_data);
 
             $bill_month_entity = new BillMonthData();
-            return $bill_month_entity->setMonthData($bill_data);
+            $bill_month_entity->setMonthData($bill_data);
             
             $bill_year_entity = new BillYearData();
-            
+            $bill_year_entity->setYearData($bill_data);
+
             $bill_total_entity = new BillTotalData();
+			$bill_total_entity->setTotalData($bill_data);
             
-//             Db::commit();
+            Db::commit();
             
             return true;
         } catch (\Exception $e) {
-//             Db::rollback();
+            Db::rollback();
             
             return false;
         }

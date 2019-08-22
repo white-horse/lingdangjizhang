@@ -58,4 +58,26 @@ class BillDayData extends Model
             return $this->save($init_data);
         }
     }
+
+	/**
+	 * 获取账单每月/年支出总天数
+	 * @param int $user_id 用户ID
+	 * @param int $date 查询的日期 月201908 | 年2019
+	 * @return int $result 
+	 */
+	public function countBillDay(int $user_id, int $date = 0)
+	{
+		$where = ['user_id' => $user_id];
+
+		if ($date) {
+			$where['bill_day'] = ['LIKE', "$date%"];
+		}
+
+		$res = $this->where($where)->field('COUNT(DISTINCT(bill_day)) AS total')->find();
+		if ($res->data['total']) {
+			return $res->data['total'];
+		}
+
+		return 0;
+	}
 }

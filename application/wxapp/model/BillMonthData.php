@@ -27,9 +27,12 @@ class BillMonthData extends Model
     {
         // 初始化入库数据
         $init_data = [];
-        
-        $bill_day = $bill_data['bill_date'];
-        $bill_month = substr($bill_day, 0, 6);
+
+        $bill_month = substr($bill_data['bill_date'], 0, 6);
+
+		// 该月支出天数
+		$bill_day_entity = new BillDayData();
+		$init_data['month_expenditure_day'] = $bill_day_entity->countBillDay($bill_data['user_id'], $bill_month);
 
         // 检查已有数据
         $where = ['user_id' => $bill_data['user_id'], 'bill_month' => $bill_month];
@@ -48,6 +51,9 @@ class BillMonthData extends Model
             
             // 余额计算: 最新收入 - 最新支出
             $month_balance_fee = $income_bill_total_fee - $init_data['expenditure_bill_total_fee'];
+
+			// 日均支出金额
+			$init_data['day_average_expenditure_fee'] = $init_data['expenditure_bill_total_fee'] / $init_data['month_expenditure_day'];
         } else if ($bill_data['bill_type'] == 2) {
             // 收入
             $init_data['income_bill_total_fee'] = $income_bill_total_fee + $bill_data['bill_amount'];
@@ -57,10 +63,13 @@ class BillMonthData extends Model
             
             // 余额计算: 最新收入 - 最新支出
             $month_balance_fee = $init_data['income_bill_total_fee'] - $expenditure_bill_total_fee;
+
+			// 日均支出金额
+			$init_data['day_average_expenditure_fee'] = $expenditure_bill_total_fee / $init_data['month_expenditure_day'];
         }
 
         $init_data['month_balance_fee'] = $month_balance_fee > 0 ? $month_balance_fee : 0;
-        
+
         if (!empty($res->data)) {
             // 更新
             return $this->save($init_data, ['id' => $res->data['id']]);
@@ -72,8 +81,26 @@ class BillMonthData extends Model
             return $this->save($init_data);
         }
     }
-    
-    /**
-     * 计算余额
-     */
+
+	/**
+	 * 获取账单每年支出总月数
+	 * @param int $user_id 用户ID
+	 * @param int $year 查询的年份2019
+	 * @return int $result 
+	 */
+	public function countBillMonth(int $user_id, int $year = 0)
+	{
+		$where = ['user_id' => $user_id];
+
+		if ($year) {
+			$where['bill_month'] = ['LIKE', "$year%"];
+		}
+
+		$res = $this->where($where)->field('COUNT(DISTINCT(bill_month)) AS total')->find();
+		if ($res->data['total']) {
+			return $res->data['total'];
+		}
+
+		return 0;
+	}
 }
