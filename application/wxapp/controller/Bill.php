@@ -38,8 +38,12 @@ class Bill extends Base
 			return $this->outputData(301, 'billType param error');
 		}
 
-		if (empty($this->request->param('billFee'))) {
-			return $this->outputData(1000, '请输入账单金额');
+		if (!preg_match('/((^[1-9]\d*)|^0)(\.{0,1}\d{0,8}){0,1}$/', $this->request->param('billFee'))) {
+			return $this->outputData(1000, '请输入正确的账单金额');
+		}
+		
+		if (!empty($this->request->param('billRemark')) && strlen($this->request->param('billRemark') > 64)) {
+		    return $this->outputData(301, 'billRemark param error');
 		}
 
 		$create_data = [
@@ -51,8 +55,7 @@ class Bill extends Base
 			'bill_date' => str_replace('-', '', $this->request->param('billDate')),
 		];
 		
-		$result['result'] = true;
-		return $this->outputData(200, 'success', $result);
+		$result['result'] = false;
 		if (self::$billItemEntity->addBill($create_data) !== false) {
 		    $result['result'] = true;
 		}
