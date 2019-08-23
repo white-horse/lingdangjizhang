@@ -42,8 +42,8 @@ class Bill extends Base
 			return $this->outputData(1000, '请输入正确的账单金额');
 		}
 		
-		if (!empty($this->request->param('billRemark')) && strlen($this->request->param('billRemark') > 64)) {
-		    return $this->outputData(301, 'billRemark param error');
+		if (!empty($this->request->param('billRemark')) && (mb_strlen($this->request->param('billRemark')) > 64)) {
+		    return $this->outputData(1001, '请输入正确的备注');
 		}
 
 		$create_data = [
