@@ -36,26 +36,31 @@ class BillItem extends Model
         
         Db::startTrans();
         try{
-            $add_bill_res = $this->save($bill_data);
+            $add_res = $this->save($bill_data);
             
             $bill_day_entity = new BillDayData();
-            $bill_day_entity->setDayData($bill_data);
+            $setday_res = $bill_day_entity->setDayData($bill_data);
 
             $bill_month_entity = new BillMonthData();
-            $bill_month_entity->setMonthData($bill_data);
+            $setmonth_res = $bill_month_entity->setMonthData($bill_data);
             
             $bill_year_entity = new BillYearData();
-            $bill_year_entity->setYearData($bill_data);
+            $setyear_res = $bill_year_entity->setYearData($bill_data);
 
             $bill_total_entity = new BillTotalData();
-			$bill_total_entity->setTotalData($bill_data);
+			$settotal_res = $bill_total_entity->setTotalData($bill_data);
             
-            Db::commit();
-            
-            return true;
+			if ($add_res && $setday_res && $setmonth_res && $setyear_res && $settotal_res) {
+
+			} else {			
+			    Db::rollback();            
+				return false;
+			}
+
+			Db::commit();            
+			return true;
         } catch (\Exception $e) {
-            Db::rollback();
-            
+            Db::rollback();            
             return false;
         }
     }

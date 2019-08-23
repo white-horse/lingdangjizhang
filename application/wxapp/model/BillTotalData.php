@@ -45,7 +45,6 @@ class BillTotalData extends Model
         $init_data = [];
 
 		$format_bill_date = date('Y-m-d', strtotime($bill_data['bill_date']));
-        $bill_year = substr($bill_data['bill_date'], 0, 4);
 
 		// 该账号支出天数
 		$bill_day_entity = new BillDayData();

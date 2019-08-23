@@ -101,6 +101,6 @@ class BillMonthData extends Model
 			return $res->data['total'];
 		}
 
-		return 0;
+		return 1;
 	}
 }
