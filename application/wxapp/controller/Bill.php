@@ -80,7 +80,6 @@ class Bill extends Base
         return $this->outputData(200, 'success', $list);
     }
     
-    
     /**
      * 初始化常用实体
      */

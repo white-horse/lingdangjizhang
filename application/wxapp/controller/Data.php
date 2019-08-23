@@ -21,7 +21,6 @@ class Data extends Base
         $this->init();
     }
     
-    
     /**
      * 获取用户中心总概览数据
      * @param string $openid
