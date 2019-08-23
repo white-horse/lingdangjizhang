@@ -11,8 +11,8 @@ use app\wxapp\model\UserAccount;
 
 class Base
 {
-    protected const WX_MINI_APP = 'wxapp';
-    protected static $userEnv;
+    protected const WX_MINI_APP = ['apizza', 'wechat'];
+    protected static $userEnv = '';
     protected $userAccountEntity = null;
     protected $openid = '';
     protected $userInfo = [];
@@ -22,10 +22,10 @@ class Base
     {
         $this->request = Request::instance();
         $this->init();
-        
+
         // 验证用户环境
-        if( self::$userEnv !== self::WX_MINI_APP ){
-            
+        if (!in_array(self::$userEnv, self::WX_MINI_APP)) {
+            exit(json_encode($this->outputData(301, 'env error')));
         }
         
         // 通用参数校验
@@ -54,17 +54,19 @@ class Base
      */
     private function init()
     {
-        self::setUserEnv();
+        $this->setUserEnv();
         $this->userAccountEntity = new UserAccount();
     }
     
     /**
      * 设置当前用户环境 
      */
-    private static function setUserEnv()
+    private function setUserEnv()
     {
-        if (true) {
-            self::$userEnv = 'wxapp';
+        if (substr_count(strtolower($this->request->header('user-agent')), 'micromessenger')) {
+            self::$userEnv = 'wechat';
+        } else if (substr_count(strtolower($this->request->header('user-agent')), 'apizza')) {
+            self::$userEnv = 'apizza';
         }
     }
     
