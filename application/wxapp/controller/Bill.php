@@ -51,7 +51,8 @@ class Bill extends Base
 			'bill_date' => str_replace('-', '', $this->request->param('billDate')),
 		];
 		
-		$result['result'] = false;
+		$result['result'] = true;
+		return $this->outputData(200, 'success', $result);
 		if (self::$billItemEntity->addBill($create_data) !== false) {
 		    $result['result'] = true;
 		}
