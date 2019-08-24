@@ -135,7 +135,7 @@ class Bill extends Base
 				$bill['bill_type_icon'] = 'expenditure';
 			}
 			
-			$bill['bill_create'] = date( 'Y-m-d H:i', strtotime($bill['create_time']));
+			$bill['bill_create'] = date('m-d H:i', strtotime($bill['create_time']));
 
 			unset($bill['update_time']);
 			unset($bill['create_time']);
@@ -163,10 +163,12 @@ class Bill extends Base
 			}
 
 			if ($income_number > 0) {
+				$income_fee = number_format($income_fee, 2);
 				$overview_text .= "+ {$income_fee}元（{$income_number}笔），";
 			}
 
 			if ($expenditure_number > 0) {
+				$expenditure_fee = number_format($expenditure_fee, 2);
 				$overview_text .= "- {$expenditure_fee}元（{$expenditure_number}笔）";
 			}
 
@@ -175,7 +177,7 @@ class Bill extends Base
 			$result[$key]['overview_text'] = rtrim($overview_text, '，');
 		}
 
-		return $result;
+		return array_values($result);
 	}
 
     /**
