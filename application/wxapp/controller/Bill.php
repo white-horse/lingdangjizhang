@@ -8,6 +8,7 @@ namespace app\wxapp\controller;
 
 use app\wxapp\model\BillTag;
 use app\wxapp\model\BillItem;
+use app\service\controller\Time;
 
 class Bill extends Base
 {
@@ -80,6 +81,51 @@ class Bill extends Base
         return $this->outputData(200, 'success', $list);
     }
     
+	/**
+	 * 获取账单列表 按日期分组 倒序
+	 * @param int $startDate 开始日期 20190801
+	 * @param int $endDate 结束日期 20190831
+	 * @return array @list 账单列表
+	 */
+	public function getItem()
+	{
+		$list = [];
+
+		$curr_month_date = Time::monthDate();
+		$start_date = $this->request->param('startDate');
+		$end_date = $this->request->param('endDate');
+
+		$start_date = $start_date ? str_replace('-', '', $start_date) : $curr_month_date[0];
+		$end_date = $end_date ? str_replace('-', '', $end_date) : $curr_month_date[1];
+
+		if (($end_date - $start_date) > 31) {
+			return $this->outputData(301, '查询日期范围不能超过31天');
+		}
+
+		$bills = self::$billItemEntity->getBills($start_date, $end_date);
+		if (!empty($bills)) {
+			$list = $this->billsGroup($bills);
+		}
+
+		return $this->outputData(200, 'success', $list);
+	}
+
+	/** 
+	 * 将账单按日期分组
+	 * @param array $bills 原账单列表
+	 * @return array $result 按日期分组后的列表
+	 */
+	private function billsGroup(array $bills = [])
+	{	
+		$result = [];
+
+		foreach ($bills as $key => $value) {
+			$result[$value['bill_date']][] = $value;
+		}
+
+		return $result;
+	}
+
     /**
      * 初始化常用实体
      */
@@ -88,4 +134,6 @@ class Bill extends Base
         self::$billTagEntity = new BillTag();
 		self::$billItemEntity = new BillItem();
     }
+
+
 }

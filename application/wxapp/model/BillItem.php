@@ -64,4 +64,17 @@ class BillItem extends Model
             return false;
         }
     }
+
+	/**
+	 * 获取账单列表
+	 * $param int $start_date
+	 * @param int $end_date
+	 * @return array $result
+	 */
+	public function getBills( $start_date,  $end_date)
+	{
+		return $this->where('bill_date', 'between', [$start_date, $end_date])
+				->order('bill_date DESC')
+				->select();
+	}
 }
