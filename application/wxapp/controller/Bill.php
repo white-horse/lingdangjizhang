@@ -135,7 +135,7 @@ class Bill extends Base
 				$bill['bill_type_icon'] = 'expenditure';
 			}
 			
-			$bill['bill_create'] = date('m-d H:i', strtotime($bill['create_time']));
+			$bill['bill_create'] = date('H:i', strtotime($bill['create_time']));
 
 			unset($bill['update_time']);
 			unset($bill['create_time']);
