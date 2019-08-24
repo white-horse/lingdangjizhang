@@ -285,6 +285,18 @@ class Time
         return self::daysToSecond() * 7 * $week;
     }
 
+	/**
+     * 日期转换成星期
+     *
+     * @param int $date
+     * @return string
+     */
+    public static function dateToWeek(int $date)
+    {	
+		$weekday = ["周日","周一","周二","周三","周四","周五","周六"];
+        return $weekday[date("w", strtotime($date))];
+    }
+
     private static function startTimeToEndTime()
     {
 

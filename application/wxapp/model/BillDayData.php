@@ -80,4 +80,20 @@ class BillDayData extends Model
 
 		return 1;
 	}
+
+	/**
+	 * 获取某天账单数据
+	 * @param array $where
+     * @param array $fields
+     * @return array $result
+	 */
+	public function getDayData(array $where = [], array $fields = [])
+	{	
+	    $res = $this->where($where)->field($fields)->find();
+        if (!empty($res->data)) {
+            return $res->data;
+        }
+        
+        return [];
+	}
 }

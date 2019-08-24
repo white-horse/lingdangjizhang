@@ -23,4 +23,20 @@ class BillTag extends Model
     {
         return $this->where($where)->field($fields)->order("sort_index DESC")->select();
     }
+
+	/**
+	 * 获取某标签
+	 * @param array $where
+     * @param array $fields
+     * @return array $result
+	 */
+	public function getTag(array $where = [], array $fields = [])
+	{	
+	    $res = $this->where($where)->field($fields)->find();
+        if (!empty($res->data)) {
+            return $res->data;
+        }
+        
+        return [];
+	}
 }

@@ -71,10 +71,11 @@ class BillItem extends Model
 	 * @param int $end_date
 	 * @return array $result
 	 */
-	public function getBills( $start_date,  $end_date)
+	public function getBills(int $user_id, int $start_date, int $end_date)
 	{
-		return $this->where('bill_date', 'between', [$start_date, $end_date])
-				->order('bill_date DESC')
-				->select();
+		return $this->where(['user_id' => $user_id])
+					->where('bill_date', 'between', [$start_date, $end_date])
+					->order('bill_date DESC')
+					->select();	
 	}
 }

@@ -8,6 +8,7 @@ namespace app\wxapp\controller;
 
 use app\wxapp\model\BillTag;
 use app\wxapp\model\BillItem;
+use app\wxapp\model\BillDayData;
 use app\service\controller\Time;
 
 class Bill extends Base
@@ -15,6 +16,7 @@ class Bill extends Base
     /**@var object 常用实体对象  */
     protected static $billTagEntity = null;
 	protected static $billItemEntity = null;
+	protected static $BillDayDataEntity = null;
 
 	/**@var array 账单类型*/
 	protected static $billType = ['z' => 1, 's' => 2];
@@ -102,7 +104,7 @@ class Bill extends Base
 			return $this->outputData(301, '查询日期范围不能超过31天');
 		}
 
-		$bills = self::$billItemEntity->getBills($start_date, $end_date);
+		$bills = self::$billItemEntity->getBills($this->userInfo['id'], $start_date, $end_date);
 		if (!empty($bills)) {
 			$list = $this->billsGroup($bills);
 		}
@@ -118,9 +120,59 @@ class Bill extends Base
 	private function billsGroup(array $bills = [])
 	{	
 		$result = [];
+		
+		// 数据分组
+		foreach ($bills as $key => $bill) {
+			// 获取账单标签颜色配置
+			$where = ['tag_name' => $bill['bill_tag']];
+			$fields = ['tag_color_name'];
+			$tag = self::$billTagEntity->getTag($where, $fields);
+			$bill['bill_tag_color'] = $tag['tag_color_name'];
+			
+			if ($bill['bill_type'] == 2) {
+				$bill['bill_type_icon'] = 'income';
+			} else {
+				$bill['bill_type_icon'] = 'expenditure';
+			}
+			
+			$bill['bill_create'] = date( 'Y-m-d H:i', strtotime($bill['create_time']));
 
-		foreach ($bills as $key => $value) {
-			$result[$value['bill_date']][] = $value;
+			unset($bill['update_time']);
+			unset($bill['create_time']);
+			unset($bill['user_id']);
+
+			$result[$bill['bill_date']]['list'][] = $bill;
+		}
+
+		// 处理数据格式
+		foreach ($result as $key => $item) {
+			
+			$expenditure_number = 0;
+			$expenditure_fee = 0;
+			$income_fee = 0;
+			$income_number = 0;
+			$overview_text = '';
+			foreach ($item['list'] as $k => $val) {
+				if ($val['bill_type'] == 2) {
+					$income_fee += $val['bill_amount'];
+					$income_number++;
+				} else {
+					$expenditure_number++;
+					$expenditure_fee += $val['bill_amount'];
+				}
+			}
+
+			if ($income_number > 0) {
+				$overview_text .= "+ {$income_fee}元（{$income_number}笔），";
+			}
+
+			if ($expenditure_number > 0) {
+				$overview_text .= "- {$expenditure_fee}元（{$expenditure_number}笔）";
+			}
+
+			$result[$key]['bill_day'] = date( 'm-d', strtotime($key));
+			$result[$key]['bill_week'] = Time::dateToWeek($key);
+			$result[$key]['overview_text'] = rtrim($overview_text, '，');
 		}
 
 		return $result;
@@ -133,6 +185,7 @@ class Bill extends Base
     {
         self::$billTagEntity = new BillTag();
 		self::$billItemEntity = new BillItem();
+		self::$BillDayDataEntity = new BillDayData();
     }
 
 
