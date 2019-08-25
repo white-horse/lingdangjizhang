@@ -180,6 +180,18 @@ class Bill extends Base
 		return array_values($result);
 	}
 
+	/**
+	 * 删除一笔账单
+	 * @param int $billId
+	 * @return boolean $result
+	 */
+	public function removeOne()
+	{
+		$billId = $this->request->param('billId');
+		
+		return $this->outputData(200, 'success', ['id' => $billId]);
+	}
+
     /**
      * 初始化常用实体
      */
