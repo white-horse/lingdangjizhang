@@ -21,9 +21,10 @@ class BillMonthData extends Model
     /**
      * 维护账单月数据
      * @param array $bill_data
+     * @param string $set_type 账单操作类型：add 添加账单； remove 删除账单
      * @return mixed $result
      */
-    public function setMonthData(array $bill_data = [])
+    public function setMonthData(array $bill_data = [], string $set_type = 'add')
     {
         // 初始化入库数据
         $init_data = [];
@@ -82,6 +83,34 @@ class BillMonthData extends Model
         }
     }
 
+    /**
+     * 账单添加：账单月数据变更
+     * @param array $bill_data
+     * @param array $exist_monthdata
+     * @return array $result 包含计算好的账单月数据元素
+     */
+    private function addBillToMonthData(array $bill_data, array $exist_monthdata = [])
+    {
+        $result = [];
+        
+        
+        return $result;
+    }
+    
+    /**
+     * 账单删除：账单月数据变更
+     * @param array $bill_data
+     * @param array $exist_monthdata
+     * @return array $result 包含计算好的账单月数据元素
+     */
+    private function removeBillToMonthData(array $bill_data, array $exist_monthdata = [])
+    {
+        $result = [];
+        
+        
+        return $result;
+    }
+
 	/**
 	 * 获取账单每年支出总月数
 	 * @param int $user_id 用户ID
@@ -103,4 +132,5 @@ class BillMonthData extends Model
 
 		return 1;
 	}
+	
 }

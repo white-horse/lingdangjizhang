@@ -21,9 +21,10 @@ class BillDayData extends Model
     /**
      * 维护账单日数据
      * @param array $bill_data
+     * @param string $set_type 账单操作类型：add 添加账单； remove 删除账单
      * @return mixed $result
      */
-    public function setDayData(array $bill_data = [])
+    public function setDayData(array $bill_data = [], string $set_type = 'add')
     {	
         // 初始化入库数据
         $init_data = [];
@@ -31,32 +32,82 @@ class BillDayData extends Model
         // 检查已有数据
         $where = ['user_id' => $bill_data['user_id'], 'bill_day' => $bill_data['bill_date']];
         $res = $this->where($where)->find();
+        $res_data = $res->data ?: [];
+        
+        // 计算账单日数据
+        if ($set_type == 'add') {
+            $init_data = $this->addBillToDayData($bill_data, $res_data);
+        } else if ($set_type == 'remove') {
+            $init_data = $this->removeBillToDayData($bill_data, $res_data);
+        }
 
-        // 支出
-        if ($bill_data['bill_type'] == 1) {
-            $expenditure_bill_total_fee = isset($res->data['expenditure_bill_total_fee'])?$res->data['expenditure_bill_total_fee']:0;
-            $init_data['expenditure_bill_total_fee'] = $expenditure_bill_total_fee + $bill_data['bill_amount'];
-            
-            $expenditure_bill_total_number = isset($res->data['expenditure_bill_total_number'])?$res->data['expenditure_bill_total_number']:0;
-            $init_data['expenditure_bill_total_number'] = $expenditure_bill_total_number + 1;
-        } else if ($bill_data['bill_type'] == 2) {
-            // 收入
-            $income_bill_total_fee = isset($res->data['income_bill_total_fee'])?$res->data['income_bill_total_fee']:0;
-            $init_data['income_bill_total_fee'] = $income_bill_total_fee + $bill_data['bill_amount'];
-            
-            $income_bill_total_number = isset($res->data['income_bill_total_number'])?$res->data['income_bill_total_number']:0;
-            $init_data['income_bill_total_number'] = $income_bill_total_number + 1;
-        } 
-
-        if (!empty($res->data)) {
+        if (!empty($res_data)) {
             // 更新
-            return $this->save($init_data, ['id' => $res->data['id']]);
+            return $this->save($init_data, ['id' => $res_data['id']]);
         } else {
             // 添加
             $init_data['user_id'] = $bill_data['user_id'];
             $init_data['bill_day'] = $bill_data['bill_date'];
             return $this->save($init_data);
         }
+    }
+    
+    /**
+     * 账单添加：账单日数据变更
+     * @param array $bill_data
+     * @param array $exist_daydata
+     * @return array $result 包含计算好的账单日数据元素
+     */
+    private function addBillToDayData(array $bill_data, array $exist_daydata = [])
+    {
+        $result = [];
+        
+        // 支出
+        if ($bill_data['bill_type'] == 1) {
+            $expenditure_bill_total_fee = isset($exist_daydata['expenditure_bill_total_fee'])?$exist_daydata['expenditure_bill_total_fee']:0;
+            $result['expenditure_bill_total_fee'] = $expenditure_bill_total_fee + $bill_data['bill_amount'];
+            
+            $expenditure_bill_total_number = isset($exist_daydata['expenditure_bill_total_number'])?$exist_daydata['expenditure_bill_total_number']:0;
+            $result['expenditure_bill_total_number'] = $expenditure_bill_total_number + 1;
+        } else if ($bill_data['bill_type'] == 2) {
+            // 收入
+            $income_bill_total_fee = isset($exist_daydata['income_bill_total_fee'])?$exist_daydata['income_bill_total_fee']:0;
+            $result['income_bill_total_fee'] = $income_bill_total_fee + $bill_data['bill_amount'];
+            
+            $income_bill_total_number = isset($exist_daydata['income_bill_total_number'])?$exist_daydata['income_bill_total_number']:0;
+            $result['income_bill_total_number'] = $income_bill_total_number + 1;
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * 账单删除：账单日数据变更
+     * @param array $bill_data
+     * @param array $exist_daydata
+     * @return array $result 包含计算好的账单日数据元素
+     */
+    private function removeBillToDayData(array $bill_data, array $exist_daydata = [])
+    {
+        $result = [];
+        
+        // 支出
+        if ($bill_data['bill_type'] == 1) {
+            $expenditure_bill_total_fee = isset($exist_daydata['expenditure_bill_total_fee'])?$exist_daydata['expenditure_bill_total_fee']:0;
+            $result['expenditure_bill_total_fee'] = $expenditure_bill_total_fee - $bill_data['bill_amount'];
+            
+            $expenditure_bill_total_number = isset($exist_daydata['expenditure_bill_total_number'])?$exist_daydata['expenditure_bill_total_number']:0;
+            $result['expenditure_bill_total_number'] = $expenditure_bill_total_number - 1;
+        } else if ($bill_data['bill_type'] == 2) {
+            // 收入
+            $income_bill_total_fee = isset($exist_daydata['income_bill_total_fee'])?$exist_daydata['income_bill_total_fee']:0;
+            $result['income_bill_total_fee'] = $income_bill_total_fee - $bill_data['bill_amount'];
+            
+            $income_bill_total_number = isset($exist_daydata['income_bill_total_number'])?$exist_daydata['income_bill_total_number']:0;
+            $result['income_bill_total_number'] = $income_bill_total_number - 1;
+        }
+        
+        return $result;
     }
 
 	/**
@@ -80,7 +131,7 @@ class BillDayData extends Model
 
 		return 1;
 	}
-
+	
 	/**
 	 * 获取某天账单数据
 	 * @param array $where

@@ -21,9 +21,10 @@ class BillYearData extends Model
     /**
      * 维护账单年数据
      * @param array $bill_data
+     * @param string $set_type 账单操作类型：add 添加账单； remove 删除账单
      * @return mixed $result
      */
-    public function setYearData(array $bill_data = [])
+    public function setYearData(array $bill_data = [], string $set_type = 'add')
     {
         // 初始化入库数据
         $init_data = [];
@@ -90,5 +91,33 @@ class BillYearData extends Model
             
             return $this->save($init_data);
         }
+    }
+    
+    /**
+     * 账单添加：账单年数据变更
+     * @param array $bill_data
+     * @param array $exist_yeardata
+     * @return array $result 包含计算好的账单年数据元素
+     */
+    private function addBillToYearData(array $bill_data, array $exist_yeardata = [])
+    {
+        $result = [];
+        
+        
+        return $result;
+    }
+    
+    /**
+     * 账单删除：账单年数据变更
+     * @param array $bill_data
+     * @param array $exist_yeardata
+     * @return array $result 包含计算好的账单年数据元素
+     */
+    private function removeBillToMonthData(array $bill_data, array $exist_yeardata = [])
+    {
+        $result = [];
+        
+        
+        return $result;
     }
 }

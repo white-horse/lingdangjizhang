@@ -20,11 +20,12 @@ class BillItem extends Model
     protected $updateTime = 'update_time';
     
     /**
-     * 添加一笔账单
-     * @param array $bill_data
+     * 设置一笔账单：添加 | 删除
+     * @param array $bill_data 账单数据
+     * @param string $set_type 账单操作类型：add 添加账单； remove 删除账单 
      * @return boolean $result
      */
-    public function addBill(array $bill_data)
+    public function setBill(array $bill_data, string $set_type = 'add')
     {	
 		// 开启事务
         // 1. 添加账单
@@ -36,21 +37,25 @@ class BillItem extends Model
         
         Db::startTrans();
         try{
-            $add_res = $this->save($bill_data);
+            if ($set_type == 'add') {
+                $bill_res = $this->save($bill_data);
+            } else if ($set_type == 'remove') {
+                $bill_res = $this->removeBill($bill_data['user_id'], $bill_data['id']);
+            }
             
             $bill_day_entity = new BillDayData();
-            $setday_res = $bill_day_entity->setDayData($bill_data);
+            $setday_res = $bill_day_entity->setDayData($bill_data, $set_type);
 
             $bill_month_entity = new BillMonthData();
-            $setmonth_res = $bill_month_entity->setMonthData($bill_data);
+            $setmonth_res = $bill_month_entity->setMonthData($bill_data, $set_type);
             
             $bill_year_entity = new BillYearData();
-            $setyear_res = $bill_year_entity->setYearData($bill_data);
+            $setyear_res = $bill_year_entity->setYearData($bill_data, $set_type);
 
             $bill_total_entity = new BillTotalData();
-			$settotal_res = $bill_total_entity->setTotalData($bill_data);
+            $settotal_res = $bill_total_entity->setTotalData($bill_data, $set_type);
             
-			if ($add_res && $setday_res && $setmonth_res && $setyear_res && $settotal_res) {
+			if ($bill_res && $setday_res && $setmonth_res && $setyear_res && $settotal_res) {
 
 			} else {			
 			    Db::rollback();            
@@ -63,6 +68,17 @@ class BillItem extends Model
             Db::rollback();            
             return false;
         }
+    }
+    
+    /**
+     * 删除一个账单
+     * @param int $user_id
+     * @param int $bill_id
+     * @return boolean $result
+     */
+    public function removeBill(int $user_id, int $bill_id)
+    {
+        return $this->where(['id' => $bill_id, 'user_id' => $user_id])->delete();
     }
 
 	/**
@@ -77,5 +93,26 @@ class BillItem extends Model
 					->where('bill_date', 'between', [$start_date, $end_date])
 					->order('bill_date DESC')
 					->select();	
+	}
+	
+	/**
+	 * 获取单个账单
+	 * @param int $user_id
+	 * @param int @bill_id
+	 * @return array $result
+	 */
+	public function getBill(int $user_id, int $bill_id, array $fields = [])
+	{
+	    $where = [
+	        'user_id' => $user_id,
+	        'id' => $bill_id
+	    ];
+	    $res = $this->where($where)->field($fields)->find();
+	    if (!empty($res->data)) {
+	        return $res->data;
+	    }
+	    
+	    return [];
+	    
 	}
 }

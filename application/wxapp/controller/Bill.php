@@ -59,7 +59,7 @@ class Bill extends Base
 		];
 		
 		$result['result'] = false;
-		if (self::$billItemEntity->addBill($create_data) !== false) {
+		if (self::$billItemEntity->setBill($create_data, 'add') !== false) {
 		    $result['result'] = true;
 		}
 		
@@ -102,6 +102,10 @@ class Bill extends Base
 
 		if (($end_date - $start_date) > 31) {
 			return $this->outputData(301, '查询日期范围不能超过31天');
+		}
+		
+		if ($end_date < $start_date) {
+		    return $this->outputData(301, '结束日期不能早于开始日期');
 		}
 
 		$bills = self::$billItemEntity->getBills($this->userInfo['id'], $start_date, $end_date);
@@ -187,7 +191,18 @@ class Bill extends Base
 	 */
 	public function removeOne()
 	{
-		$billId = $this->request->param('billId');
+		$bill_id = $this->request->param('billId');
+		
+		if (empty($bill_id)) {
+		    return $this->outputData(301, 'param error');
+		}
+		
+		$bill_data = self::$billItemEntity->getBill($this->userInfo['id'], $bill_id);
+		if (empty($bill_data)) {
+		    return $this->outputData(301, 'bill error');
+		}
+		
+		return $remove_res = self::$billItemEntity->setBill($bill_data, 'remove');
 		
 		return $this->outputData(200, 'success', ['id' => $billId]);
 	}

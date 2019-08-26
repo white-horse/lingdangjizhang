@@ -37,9 +37,10 @@ class BillTotalData extends Model
     /**
      * 维护账单总数据
      * @param array $bill_data
+     * @param string $set_type 账单操作类型：add 添加账单； remove 删除账单
      * @return mixed $result
      */
-    public function setTotalData(array $bill_data = [])
+    public function setTotalData(array $bill_data = [], string $set_type = 'add')
     {
         // 初始化入库数据
         $init_data = [];
@@ -110,5 +111,33 @@ class BillTotalData extends Model
 
             return $this->save($init_data);
         }
+    }
+    
+    /**
+     * 账单添加：账单总数据变更
+     * @param array $bill_data
+     * @param array $exist_totaldata
+     * @return array $result 包含计算好的账单总数据元素
+     */
+    private function addBillToTotalData(array $bill_data, array $exist_totaldata = [])
+    {
+        $result = [];
+        
+        
+        return $result;
+    }
+    
+    /**
+     * 账单删除：账单总数据变更
+     * @param array $bill_data
+     * @param array $exist_daydata
+     * @return array $result 包含计算好的账单总数据元素
+     */
+    private function removeBillToTotalData(array $bill_data, array $exist_totaldata = [])
+    {
+        $result = [];
+        
+        
+        return $result;
     }
 }
