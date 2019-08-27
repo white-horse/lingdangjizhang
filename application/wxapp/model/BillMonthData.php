@@ -29,55 +29,29 @@ class BillMonthData extends Model
         // 初始化入库数据
         $init_data = [];
 
-        $bill_month = substr($bill_data['bill_date'], 0, 6);
-
-		// 该月支出天数
-		$bill_day_entity = new BillDayData();
-		$init_data['month_expenditure_day'] = $bill_day_entity->countBillDay($bill_data['user_id'], $bill_month);
+        $bill_data['bill_month']= substr($bill_data['bill_date'], 0, 6);
 
         // 检查已有数据
-        $where = ['user_id' => $bill_data['user_id'], 'bill_month' => $bill_month];
+        $where = ['user_id' => $bill_data['user_id'], 'bill_month' => $bill_data['bill_month']];
         $res = $this->where($where)->find();
+        $res_data = isset($res->data) ? $res->data : [];
         
-        // 初始化现有支出 和 收入
-        $expenditure_bill_total_fee = isset($res->data['expenditure_bill_total_fee'])?$res->data['expenditure_bill_total_fee']:0;
-        $income_bill_total_fee = isset($res->data['income_bill_total_fee'])?$res->data['income_bill_total_fee']:0;
-        
-        // 支出
-        if ($bill_data['bill_type'] == 1) {
-            $init_data['expenditure_bill_total_fee'] = $expenditure_bill_total_fee + $bill_data['bill_amount'];
-            
-            $expenditure_bill_total_number = isset($res->data['expenditure_bill_total_number'])?$res->data['expenditure_bill_total_number']:0;
-            $init_data['expenditure_bill_total_number'] = $expenditure_bill_total_number + 1;
-            
-            // 余额计算: 最新收入 - 最新支出
-            $month_balance_fee = $income_bill_total_fee - $init_data['expenditure_bill_total_fee'];
-
-			// 日均支出金额
-			$init_data['day_average_expenditure_fee'] = $init_data['expenditure_bill_total_fee'] / $init_data['month_expenditure_day'];
-        } else if ($bill_data['bill_type'] == 2) {
-            // 收入
-            $init_data['income_bill_total_fee'] = $income_bill_total_fee + $bill_data['bill_amount'];
-            
-            $income_bill_total_number = isset($res->data['income_bill_total_number'])?$res->data['income_bill_total_number']:0;
-            $init_data['income_bill_total_number'] = $income_bill_total_number + 1;
-            
-            // 余额计算: 最新收入 - 最新支出
-            $month_balance_fee = $init_data['income_bill_total_fee'] - $expenditure_bill_total_fee;
-
-			// 日均支出金额
-			$init_data['day_average_expenditure_fee'] = $expenditure_bill_total_fee / $init_data['month_expenditure_day'];
+        // 计算账单月数据
+        if ($set_type == 'add') {
+            $init_data = $this->addBillToMonthData($bill_data, $res_data);
+        } else if ($set_type == 'remove') {
+            $init_data = $this->removeBillToMonthData($bill_data, $res_data);
+        } else {
+            return false;
         }
-
-        $init_data['month_balance_fee'] = $month_balance_fee > 0 ? $month_balance_fee : 0;
-
-        if (!empty($res->data)) {
+        
+        if (!empty($res_data)) {
             // 更新
-            return $this->save($init_data, ['id' => $res->data['id']]);
+            return $this->save($init_data, ['id' => $res_data['id']]);
         } else {
             // 添加
             $init_data['user_id'] = $bill_data['user_id'];
-            $init_data['bill_month'] = $bill_month;
+            $init_data['bill_month'] = $bill_data['bill_month'];
             
             return $this->save($init_data);
         }
@@ -93,6 +67,41 @@ class BillMonthData extends Model
     {
         $result = [];
         
+        // 该月支出天数
+        $bill_day_entity = new BillDayData();
+        $result['month_expenditure_day'] = $bill_day_entity->countBillDay($bill_data['user_id'], $bill_data['bill_month']);
+        
+        // 初始化现有支出 和 收入
+        $expenditure_bill_total_fee = isset($exist_monthdata['expenditure_bill_total_fee'])?$exist_monthdata['expenditure_bill_total_fee']:0;
+        $income_bill_total_fee = isset($exist_monthdata['income_bill_total_fee'])?$exist_monthdata['income_bill_total_fee']:0;
+        
+        // 支出
+        if ($bill_data['bill_type'] == 1) {
+            $result['expenditure_bill_total_fee'] = $expenditure_bill_total_fee + $bill_data['bill_amount'];
+            
+            $expenditure_bill_total_number = isset($exist_monthdata['expenditure_bill_total_number'])?$exist_monthdata['expenditure_bill_total_number']:0;
+            $result['expenditure_bill_total_number'] = $expenditure_bill_total_number + 1;
+            
+            // 余额计算: 最新收入 - 最新支出
+            $month_balance_fee = $income_bill_total_fee - $result['expenditure_bill_total_fee'];
+            
+            // 日均支出金额
+            $result['day_average_expenditure_fee'] = $result['expenditure_bill_total_fee'] / $result['month_expenditure_day'];
+        } else if ($bill_data['bill_type'] == 2) {
+            // 收入
+            $result['income_bill_total_fee'] = $income_bill_total_fee + $bill_data['bill_amount'];
+            
+            $income_bill_total_number = isset($exist_monthdata['income_bill_total_number'])?$exist_monthdata['income_bill_total_number']:0;
+            $result['income_bill_total_number'] = $income_bill_total_number + 1;
+            
+            // 余额计算: 最新收入 - 最新支出
+            $month_balance_fee = $result['income_bill_total_fee'] - $expenditure_bill_total_fee;
+            
+            // 日均支出金额
+            $result['day_average_expenditure_fee'] = $expenditure_bill_total_fee / $result['month_expenditure_day'];
+        }
+        
+        $result['month_balance_fee'] = $month_balance_fee > 0 ? $month_balance_fee : 0;
         
         return $result;
     }
@@ -107,6 +116,41 @@ class BillMonthData extends Model
     {
         $result = [];
         
+        // 该月支出天数
+        $bill_day_entity = new BillDayData();
+        $result['month_expenditure_day'] = $bill_day_entity->countBillDay($bill_data['user_id'], $bill_data['bill_month']);
+        
+        // 初始化现有支出 和 收入
+        $expenditure_bill_total_fee = isset($exist_monthdata['expenditure_bill_total_fee'])?$exist_monthdata['expenditure_bill_total_fee']:0;
+        $income_bill_total_fee = isset($exist_monthdata['income_bill_total_fee'])?$exist_monthdata['income_bill_total_fee']:0;
+        
+        // 支出
+        if ($bill_data['bill_type'] == 1) {
+            $result['expenditure_bill_total_fee'] = $expenditure_bill_total_fee - $bill_data['bill_amount'];
+            
+            $expenditure_bill_total_number = isset($exist_monthdata['expenditure_bill_total_number'])?$exist_monthdata['expenditure_bill_total_number']:0;
+            $result['expenditure_bill_total_number'] = $expenditure_bill_total_number - 1;
+            
+            // 余额计算: 最新收入 - 最新支出
+            $month_balance_fee = $income_bill_total_fee - $result['expenditure_bill_total_fee'];
+            
+            // 日均支出金额
+            $result['day_average_expenditure_fee'] = $result['expenditure_bill_total_fee'] / $result['month_expenditure_day'];
+        } else if ($bill_data['bill_type'] == 2) {
+            // 收入
+            $result['income_bill_total_fee'] = $income_bill_total_fee - $bill_data['bill_amount'];
+            
+            $income_bill_total_number = isset($exist_monthdata['income_bill_total_number'])?$exist_monthdata['income_bill_total_number']:0;
+            $result['income_bill_total_number'] = $income_bill_total_number - 1;
+            
+            // 余额计算: 最新收入 - 最新支出
+            $month_balance_fee = $result['income_bill_total_fee'] - $expenditure_bill_total_fee;
+            
+            // 日均支出金额
+            $result['day_average_expenditure_fee'] = $expenditure_bill_total_fee / $result['month_expenditure_day'];
+        }
+        
+        $result['month_balance_fee'] = $month_balance_fee > 0 ? $month_balance_fee : 0;
         
         return $result;
     }

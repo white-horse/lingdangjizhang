@@ -32,13 +32,15 @@ class BillDayData extends Model
         // 检查已有数据
         $where = ['user_id' => $bill_data['user_id'], 'bill_day' => $bill_data['bill_date']];
         $res = $this->where($where)->find();
-        $res_data = $res->data ?: [];
+        $res_data = isset($res->data) ? $res->data : [];
         
         // 计算账单日数据
         if ($set_type == 'add') {
             $init_data = $this->addBillToDayData($bill_data, $res_data);
         } else if ($set_type == 'remove') {
             $init_data = $this->removeBillToDayData($bill_data, $res_data);
+        } else {
+            return false;
         }
 
         if (!empty($res_data)) {
@@ -48,6 +50,7 @@ class BillDayData extends Model
             // 添加
             $init_data['user_id'] = $bill_data['user_id'];
             $init_data['bill_day'] = $bill_data['bill_date'];
+            
             return $this->save($init_data);
         }
     }

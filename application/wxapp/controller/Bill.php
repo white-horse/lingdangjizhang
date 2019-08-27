@@ -202,9 +202,12 @@ class Bill extends Base
 		    return $this->outputData(301, 'bill error');
 		}
 		
-		return $remove_res = self::$billItemEntity->setBill($bill_data, 'remove');
+		$result['result'] = false;
+		if (self::$billItemEntity->setBill($bill_data, 'remove') !== false) {
+		    $result['result'] = true;
+		}
 		
-		return $this->outputData(200, 'success', ['id' => $billId]);
+		return $this->outputData(200, 'success', $result);
 	}
 
     /**

@@ -28,7 +28,7 @@ class BillItem extends Model
     public function setBill(array $bill_data, string $set_type = 'add')
     {	
 		// 开启事务
-        // 1. 添加账单
+        // 1. 添加/移除账单
         // 2. 维护账单日数据
         // 3. 维护账单月数据
         // 4. 维护账单年数据
@@ -40,7 +40,7 @@ class BillItem extends Model
             if ($set_type == 'add') {
                 $bill_res = $this->save($bill_data);
             } else if ($set_type == 'remove') {
-                $bill_res = $this->removeBill($bill_data['user_id'], $bill_data['id']);
+                $bill_res = $this->where(['id' => $bill_data['id'], 'user_id' => $bill_data['user_id']])->delete();
             }
             
             $bill_day_entity = new BillDayData();
@@ -51,10 +51,10 @@ class BillItem extends Model
             
             $bill_year_entity = new BillYearData();
             $setyear_res = $bill_year_entity->setYearData($bill_data, $set_type);
-
+            
             $bill_total_entity = new BillTotalData();
             $settotal_res = $bill_total_entity->setTotalData($bill_data, $set_type);
-            
+
 			if ($bill_res && $setday_res && $setmonth_res && $setyear_res && $settotal_res) {
 
 			} else {			
@@ -62,7 +62,7 @@ class BillItem extends Model
 				return false;
 			}
 
-			Db::commit();            
+			Db::commit();
 			return true;
         } catch (\Exception $e) {
             Db::rollback();            
@@ -70,17 +70,6 @@ class BillItem extends Model
         }
     }
     
-    /**
-     * 删除一个账单
-     * @param int $user_id
-     * @param int $bill_id
-     * @return boolean $result
-     */
-    public function removeBill(int $user_id, int $bill_id)
-    {
-        return $this->where(['id' => $bill_id, 'user_id' => $user_id])->delete();
-    }
-
 	/**
 	 * 获取账单列表
 	 * $param int $start_date
@@ -91,7 +80,7 @@ class BillItem extends Model
 	{
 		return $this->where(['user_id' => $user_id])
 					->where('bill_date', 'between', [$start_date, $end_date])
-					->order('bill_date DESC')
+					->order('bill_date DESC, create_time DESC')
 					->select();	
 	}
 	
