@@ -100,6 +100,10 @@ class Bill extends Base
 		$start_date = $start_date ? str_replace('-', '', $start_date) : $curr_month_date[0];
 		$end_date = $end_date ? str_replace('-', '', $end_date) : $curr_month_date[1];
 
+		if (!preg_match('/^\d{8}$/', $start_date) || !preg_match('/^\d{8}$/', $end_date)) {
+			return $this->outputData(301, '日期错误');			
+		}
+
 		if (($end_date - $start_date) > 31) {
 			return $this->outputData(301, '查询日期范围不能超过31天');
 		}
