@@ -204,6 +204,31 @@ class Bill extends Base
 		
 		$result['result'] = false;
 		if (self::$billItemEntity->setBill($bill_data, 'remove') !== false) {
+		    // 获取该账单当日支出 收入数据
+		    $where = [
+		        'user_id' => $this->userInfo['id'],
+		        'bill_day' => $bill_data['bill_date'],
+		    ];
+		    $bill_daydata = self::$BillDayDataEntity->getDayData($where);
+		    $overview_text = '';
+		    if ($bill_daydata['income_bill_total_number'] > 0) {
+		        $bill_daydata['income_bill_total_fee'] = number_format($bill_daydata['income_bill_total_fee'], 2);
+		        $overview_text .= "+ {$bill_daydata['income_bill_total_fee']}元（{$bill_daydata['income_bill_total_number']}笔），";
+		    }
+		    
+		    if ($bill_daydata['expenditure_bill_total_number'] > 0) {
+		        $bill_daydata['expenditure_bill_total_fee'] = number_format($bill_daydata['expenditure_bill_total_fee'], 2);
+		        $overview_text .= "- {$bill_daydata['expenditure_bill_total_fee']}元（{$bill_daydata['expenditure_bill_total_number']}笔）";
+		    }
+		    
+		    $overview_text = rtrim($overview_text, '，');
+		    
+		    $result['removeEle'] = 'day';
+		    if ($overview_text != '') {
+		        $result['removeEle'] = 'bill';
+		        $result['overview_text'] = $overview_text;
+		    }
+		    
 		    $result['result'] = true;
 		}
 		
