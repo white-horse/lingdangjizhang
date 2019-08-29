@@ -103,7 +103,7 @@ class Bill extends Base
 		if (!preg_match('/^\d{8}$/', $start_date) || !preg_match('/^\d{8}$/', $end_date)) {
 			return $this->outputData(301, '日期错误');			
 		}
-
+		
 		if (($end_date - $start_date) > 31) {
 			return $this->outputData(301, '查询日期范围不能超过31天');
 		}
