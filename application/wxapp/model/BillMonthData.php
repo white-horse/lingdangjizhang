@@ -177,4 +177,21 @@ class BillMonthData extends Model
 		return 1;
 	}
 	
+	/**
+	 * 获取某月账单数据
+	 * @param array $where
+	 * @param array $fields
+	 * @return array $result
+	 */
+	public function getMonthData(array $where = [], array $fields = [])
+	{
+	    $res = $this->where($where)->field($fields)->find();
+	    if (!empty($res->data)) {
+	        return $res->data;
+	    }
+	    
+	    return [];
+	}
+	
+	    
 }

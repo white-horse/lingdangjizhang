@@ -150,4 +150,25 @@ class BillDayData extends Model
         
         return [];
 	}
+	
+	/**
+	 * 获取某几天账单集合数据
+	 * @param array $where
+	 * @param array $count_day_fields 统计的字段列表 key => value  字段别名 => 字段
+	 * @return array $result
+	 */
+	public function countDaysBill(array $where = [], array $count_day_fields = [])
+	{  
+	    $result = [];
+	    
+	    foreach ($count_day_fields as $alias => $field) {
+	        if ($field == 'average_expenditure') {
+	            $result[$alias] = $this->where($where)->avg('expenditure_bill_total_fee');
+	        } else {
+	            $result[$alias] = $this->where($where)->sum($field);
+	        }
+	    }
+	    
+	    return $result;
+	}
 }

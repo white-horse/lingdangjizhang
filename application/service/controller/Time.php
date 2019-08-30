@@ -19,12 +19,23 @@ class Time
      *
      * @return array
      */
-    public static function today()
+    public static function todayTime()
     {
         return [
             mktime(0, 0, 0, date('m'), date('d'), date('Y')),
             mktime(23, 59, 59, date('m'), date('d'), date('Y'))
         ];
+    }
+    
+    /**
+     * 返回今日日期
+     *
+     * @return string
+     */
+    public static function todayDate(string $delimiter = '')
+    {
+        $today = date('d');
+        return date('Y')."{$delimiter}".date('m')."{$delimiter}{$today}";
     }
 
     /**
@@ -32,7 +43,7 @@ class Time
      *
      * @return array
      */
-    public static function yesterday()
+    public static function yesterdayTime()
     {
         $yesterday = date('d') - 1;
         return [
@@ -44,11 +55,12 @@ class Time
 	/**
      * 返回昨日日期
      *
-     * @return int
+     * @return string
      */
-    public static function yesterdayDate()
+    public static function yesterdayDate(string $delimiter = '')
     {
-        return date('d') - 1;
+        $yestoday = date('d')-1;
+        return date('Y')."{$delimiter}".date('m')."{$delimiter}{$yestoday}";
     }
 
     /**
@@ -56,7 +68,7 @@ class Time
      *
      * @return array
      */
-    public static function week()
+    public static function weekTime()
     {
         $timestamp = time();
         return [
@@ -74,8 +86,8 @@ class Time
     {
         $timestamp = time();
         return [
-            date("Y{$delimiter}m{$delimiter}d", strtotime("+0 week Monday", $timestamp)),
-            date("Y{$delimiter}m{$delimiter}d", strtotime("+0 week Sunday", $timestamp)) + 24 * 3600 - 1
+            date("Y{$delimiter}m{$delimiter}d", strtotime("-1 week Monday", $timestamp)),
+            date("Y{$delimiter}m{$delimiter}d", strtotime("+0 week Sunday", $timestamp) + 24 * 3600 - 1)
         ];
     }
 
@@ -84,7 +96,7 @@ class Time
      *
      * @return array
      */
-    public static function lastWeek()
+    public static function lastWeekTime()
     {
         $timestamp = time();
         return [
@@ -103,7 +115,7 @@ class Time
         $timestamp = time();
         return [
             date("Y{$delimiter}m{$delimiter}d", strtotime("last week Monday", $timestamp)),
-            date("Y{$delimiter}m{$delimiter}d", strtotime("last week Sunday", $timestamp)) + 24 * 3600 - 1
+            date("Y{$delimiter}m{$delimiter}d", strtotime("last week Sunday", $timestamp) + 24 * 3600 - 1)
         ];
     }
 
@@ -112,7 +124,7 @@ class Time
      *
      * @return array
      */
-    public static function month()
+    public static function monthTime()
     {
         return [
             mktime(0, 0, 0, date('m'), 1, date('Y')),
@@ -132,13 +144,23 @@ class Time
 			date('Y').$delimiter.date('m').$delimiter.date('t')
         ];
     }
+    
+    /**
+     * 返回本月
+     *
+     * @return array
+     */
+    public static function month(string $delimiter = '')
+    {
+          return date("Y{$delimiter}m");
+    }
 
     /**
      * 返回上个月开始和结束的时间戳
      *
      * @return array
      */
-    public static function lastMonth()
+    public static function lastMonthTime()
     {
         $begin = mktime(0, 0, 0, date('m') - 1, 1, date('Y'));
         $end = mktime(23, 59, 59, date('m') - 1, date('t', $begin), date('Y'));
@@ -161,11 +183,20 @@ class Time
     }
 
     /**
+     * 返回上个月份
+     * @return int
+     */
+    public static function lastMonth(string $delimiter = '')
+    {
+        return date("Y{$delimiter}m")-1;
+    }
+    
+    /**
      * 返回今年开始和结束的时间戳
      *
      * @return array
      */
-    public static function year()
+    public static function yearTime()
     {
         return [
             mktime(0, 0, 0, 1, 1, date('Y')),
@@ -191,7 +222,7 @@ class Time
      *
      * @return array
      */
-    public static function lastYear()
+    public static function lastYearTime()
     {
         $year = date('Y') - 1;
         return [
