@@ -60,6 +60,8 @@ class Time
     public static function yesterdayDate(string $delimiter = '')
     {
         $yestoday = date('d')-1;
+        $yestoday = strlen($yestoday) > 1 ? $yestoday : '0'.$yestoday;
+        
         return date('Y')."{$delimiter}".date('m')."{$delimiter}{$yestoday}";
     }
 

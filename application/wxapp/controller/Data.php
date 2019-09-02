@@ -118,7 +118,7 @@ class Data extends Base
             [$week[0], $week[1]]
         ];
         $result['currWeekData'] = self::$billDayDataEntity->countDaysBill($day_where, $count_day_fields);
-        $result['lastWeekData']['date'] = substr($week[0], 4).'~'.substr($week[1], 4);
+        $result['currWeekData']['date'] = substr($week[0], 4).'~'.substr($week[1], 4);
         
         // 上月
         $month_where = [
