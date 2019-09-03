@@ -10,6 +10,7 @@ use app\wxapp\model\BillTag;
 use app\wxapp\model\BillItem;
 use app\wxapp\model\BillDayData;
 use app\service\controller\Time;
+use think\Session;
 
 class Bill extends Base
 {
@@ -33,6 +34,10 @@ class Bill extends Base
 	 */
 	public function createOne()
 	{
+	    if (empty($this->request->param('formUniqueFlag'))) {
+	        return $this->outputData(301, 'flag param error');
+	    }
+	    
 		if (!preg_match('/^\d{4}-\d{2}-\d{2}/', $this->request->param('billDate'))) {
 			return $this->outputData(301, 'billDate param error');
 		}
@@ -48,7 +53,16 @@ class Bill extends Base
 		if (!empty($this->request->param('billRemark')) && (mb_strlen($this->request->param('billRemark')) > 64)) {
 		    return $this->outputData(1001, '请输入正确的备注');
 		}
-
+		
+		// 设置表单本次提交标识
+		$submit_flag = $this->request->param('formUniqueFlag');
+		$session_key = md5('formUniqueFlag_'.$submit_flag);
+		if (!empty(Session::get($session_key))) {
+		    return $this->outputData(1002, '处理中');
+		} else {
+		    Session::set($session_key, $submit_flag);
+		}
+		
 		$create_data = [
 			'user_id' => $this->userInfo['id'],
 		    'bill_type' => self::$billType[$this->request->param('billType')],
@@ -62,6 +76,9 @@ class Bill extends Base
 		if (self::$billItemEntity->setBill($create_data, 'add') !== false) {
 		    $result['result'] = true;
 		}
+		
+		// 删除本次提交标识
+		Session::delete($session_key);
 		
 		return $this->outputData(200, 'success', $result);
 	}
@@ -240,7 +257,7 @@ class Bill extends Base
 		
 		return $this->outputData(200, 'success', $result);
 	}
-
+	
     /**
      * 初始化常用实体
      */
