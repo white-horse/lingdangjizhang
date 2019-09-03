@@ -126,7 +126,7 @@ class Bill extends Base
 	 * @return array $result 按日期分组后的列表
 	 */
 	private function billsGroup(array $bills = [])
-	{	
+	{
 		$result = [];
 		
 		// 数据分组
@@ -142,7 +142,7 @@ class Bill extends Base
 			} else {
 				$bill['bill_type_icon'] = 'expenditure';
 			}
-			
+
 			$bill['bill_create'] = date('H:i', strtotime($bill['create_time']));
 
 			unset($bill['update_time']);
@@ -168,6 +168,8 @@ class Bill extends Base
 					$expenditure_number++;
 					$expenditure_fee += $val['bill_amount'];
 				}
+				
+				$val['bill_amount'] = number_format($val['bill_amount'], 2);
 			}
 
 			if ($income_number > 0) {

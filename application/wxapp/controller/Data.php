@@ -45,14 +45,19 @@ class Data extends Base
         
        $data = self::$billTotalDataEntity->getOne($where, $fields);
        if (empty($data)) {
-                $data = [
-                    'totalIncomeFee' => '0.00',
-                    'totalExpenditureFee' => '0.00',
-                    'totalBalanceFee' => '0.00',
-                    'averageDayExpenditureFee' => '0.00',
-                    'dataStartDate' => date('Y-m-d'),
-                    'dataLatestDate' => date('Y-m-d')
-                ];
+            $data = [
+                'totalIncomeFee' => '0.00',
+                'totalExpenditureFee' => '0.00',
+                'totalBalanceFee' => '0.00',
+                'averageDayExpenditureFee' => '0.00',
+                'dataStartDate' => date('Y-m-d'),
+                'dataLatestDate' => date('Y-m-d')
+            ];
+        } else {
+            $data['totalIncomeFee'] = number_format($data['totalIncomeFee'], 2);
+            $data['totalExpenditureFee'] = number_format($data['totalExpenditureFee'], 2);
+            $data['totalBalanceFee'] = number_format($data['totalBalanceFee'], 2);
+            $data['averageDayExpenditureFee'] = number_format($data['averageDayExpenditureFee'], 2);
         }
         
         return $this->outputData(200, 'success', $data);
@@ -90,11 +95,27 @@ class Data extends Base
             'income_bill_total_number AS incomeTotal',
         ];
         $result['yestodayData'] = self::$billDayDataEntity->getDayData($day_where, $day_fields);
+        if (empty($result['yestodayData'])) {
+            $result['yestodayData'] = [
+                'expenditureFee' => 0,
+                'expenditureTotal' => 0,
+                'incomeFee' => 0,
+                'incomeTotal' => 0,
+            ];
+        }
         $result['yestodayData']['date'] = substr($yestoday, 4);
         
         // 今日
         $day_where['bill_day'] = $today;
         $result['todayData'] = self::$billDayDataEntity->getDayData($day_where, $day_fields);
+        if (empty($result['todayData'])) {
+            $result['todayData'] = [
+                'expenditureFee' => 0,
+                'expenditureTotal' => 0,
+                'incomeFee' => 0,
+                'incomeTotal' => 0,
+            ];
+        }
         $result['todayData']['date'] = substr($today, 4);
         
         // 上周
@@ -110,6 +131,15 @@ class Data extends Base
             'averageExpenditureFee' => 'average_expenditure'
         ];
         $result['lastWeekData'] = self::$billDayDataEntity->countDaysBill($day_where, $count_day_fields);
+        if (empty($result['lastWeekData'])) {
+            $result['lastWeekData'] = [
+                'expenditureFee' => 0,
+                'expenditureTotal' => 0,
+                'incomeFee' => 0,
+                'incomeTotal' => 0,
+                'averageExpenditureFee' => 0,
+            ];
+        }
         $result['lastWeekData']['date'] = substr($last_week[0], 4).'~'.substr($last_week[1], 4);
         
         // 本周
@@ -118,6 +148,15 @@ class Data extends Base
             [$week[0], $week[1]]
         ];
         $result['currWeekData'] = self::$billDayDataEntity->countDaysBill($day_where, $count_day_fields);
+        if (empty($result['currWeekData'])) {
+            $result['currWeekData'] = [
+                'expenditureFee' => 0,
+                'expenditureTotal' => 0,
+                'incomeFee' => 0,
+                'incomeTotal' => 0,
+                'averageExpenditureFee' => 0,
+            ];
+        }
         $result['currWeekData']['date'] = substr($week[0], 4).'~'.substr($week[1], 4);
         
         // 上月
@@ -136,10 +175,44 @@ class Data extends Base
         ];
         
         $result['lastMonthData'] = self::$billMonthDataEntity->getMonthData($month_where, $month_fields);
+        if (empty($result['lastMonthData'])) {
+            $result['lastMonthData'] = [
+                'date' => $last_month,
+                'expenditureFee' => 0,
+                'expenditureTotal' => 0,
+                'incomeFee' => 0,
+                'incomeTotal' => 0,
+                'averageExpenditureFee' => 0,
+                'balanceFee' => 0,
+            ];
+        }
         
         // 本月
         $month_where['bill_month'] = $month;
         $result['currMonthData'] = self::$billMonthDataEntity->getMonthData($month_where, $month_fields);
+        if (empty($result['currMonthData'])) {
+            $result['currMonthData'] = [
+                'date' => $month,
+                'expenditureFee' => 0,
+                'expenditureTotal' => 0,
+                'incomeFee' => 0,
+                'incomeTotal' => 0,
+                'averageExpenditureFee' => 0,
+                'balanceFee' => 0,
+            ];
+        }
+        
+        // 格式化金额字段 小数点后保留两位
+        $fee_fields = ['averageExpenditureFee', 'expenditureFee', 'incomeFee', 'balanceFee'];
+        foreach ($result as $key => $sub_item) {
+            foreach ($sub_item as $sub_key => $sub_val ) {
+                if (in_array($sub_key, $fee_fields)) {
+                    $sub_item[$sub_key] = number_format($sub_val, 2);
+                }                
+            }
+                
+            $result[$key] = $sub_item;
+        }
         
         return $this->outputData(200, 'success', $result);
     }
