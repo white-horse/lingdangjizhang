@@ -60,11 +60,7 @@ class Bill extends Base
 		if (!empty(Session::get($session_key))) {
 		    return $this->outputData(1002, '处理中');
 		} else {
-		    $session_value = [
-		        'flag' => $submit_flag,
-		        'save_time' => time()
-		    ];
-		    Session::set($session_key, $session_value);
+		    Session::set($session_key, $submit_flag);
 		}
 		
 		$create_data = [

@@ -30,7 +30,7 @@ class Base
         
         // 通用参数校验
         if (strlen($this->request->param('openid')) != 28) {
-            exit(json_encode($this->outputData(301, 'openid error')));
+            exit(json_encode($this->outputData(301, '请登录')));
         }
         
         $this->openid = $this->request->param('openid');
