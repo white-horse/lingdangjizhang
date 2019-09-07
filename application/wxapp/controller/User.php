@@ -25,7 +25,9 @@ class User extends Base
         $mobile_phone = $this->request->param('acctPhone');
         if (!empty($mobile_phone) && !check_mobile_no($mobile_phone)) {
             return $this->outputData(301, 'mobile_phone param error');
-        }
+        } else {
+			$mobile_phone = $mobile_phone ?: 0;
+		}
         
         $gender = $this->request->param('gender');
         if ($gender !== null && !in_array($gender, self::$gender) ) {
