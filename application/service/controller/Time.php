@@ -73,8 +73,14 @@ class Time
     public static function weekTime()
     {
         $timestamp = time();
+        if (date('w', $timestamp) == 0) {
+            $start_week = "-1 week Monday";
+        } else {
+            $start_week = "+0 week Monday";
+        }
+        
         return [
-            strtotime(date('Y-m-d', strtotime("+0 week Monday", $timestamp))),
+            strtotime(date('Y-m-d', strtotime($start_week, $timestamp))),
             strtotime(date('Y-m-d', strtotime("+0 week Sunday", $timestamp))) + 24 * 3600 - 1
         ];
     }
@@ -87,8 +93,14 @@ class Time
     public static function weekDate(string $delimiter = '')
     {
         $timestamp = time();
+        if (date('w', $timestamp) == 0) {
+            $start_week = "-1 week Monday";
+        } else {
+            $start_week = "+0 week Monday";
+        }
+        
         return [
-            date("Y{$delimiter}m{$delimiter}d", strtotime("-1 week Monday", $timestamp)),
+            date("Y{$delimiter}m{$delimiter}d", strtotime($start_week, $timestamp)),
             date("Y{$delimiter}m{$delimiter}d", strtotime("+0 week Sunday", $timestamp) + 24 * 3600 - 1)
         ];
     }
