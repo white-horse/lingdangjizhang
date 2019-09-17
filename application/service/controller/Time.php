@@ -73,10 +73,10 @@ class Time
     public static function weekTime()
     {
         $timestamp = time();
-        if (date('w', $timestamp) == 0) {
-            $start_week = "-1 week Monday";
-        } else {
+        if (date('w', $timestamp) == 1) {
             $start_week = "+0 week Monday";
+        } else {
+            $start_week = "-1 week Monday";
         }
         
         return [
@@ -93,10 +93,10 @@ class Time
     public static function weekDate(string $delimiter = '')
     {
         $timestamp = time();
-        if (date('w', $timestamp) == 0) {
-            $start_week = "-1 week Monday";
-        } else {
+        if (date('w', $timestamp) == 1) {
             $start_week = "+0 week Monday";
+        } else {
+            $start_week = "-1 week Monday";
         }
         
         return [
