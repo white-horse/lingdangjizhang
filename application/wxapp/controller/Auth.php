@@ -20,7 +20,6 @@ class Auth
      */
     public function getOpenid(Request $request)
     {
-        
         $code = $request->param('code', '');
         if ($code) {
             $url = Config::get('wxapp.get_openid_url').'?appid='.Config::get('wxapp.app_id').'&secret='

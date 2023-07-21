@@ -6,8 +6,6 @@
  */
 namespace app\wxapp\controller;
 
-//use think\Config;
-
 class User extends Base
 {
     /** 性别定义  */

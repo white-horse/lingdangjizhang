@@ -20,6 +20,7 @@ class Base
     
     public function __construct()
     {
+        die('oop');
         $this->request = Request::instance();
         $this->init();
 
