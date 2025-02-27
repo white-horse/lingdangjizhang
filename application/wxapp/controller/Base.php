@@ -12,7 +12,7 @@ use app\wxapp\model\UserAccount;
 class Base
 {
     protected const WX_MINI_APP = ['apizza', 'wechat'];
-    protected static $userEnv = 'wechat';
+    protected static $userEnv = '';
     protected $userAccountEntity = null;
     protected $openid = '';
     protected $userInfo = [];
