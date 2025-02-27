@@ -14,7 +14,7 @@ return [
         // 数据库类型
         'type'            => 'mysql',
         // 服务器地址
-        'hostname'        => '132.232.39.231',
+        'hostname'        => 'localhost',//132.232.39.231
         // 数据库名
         'database'        => 'lingdang_bill',
         // 用户名
