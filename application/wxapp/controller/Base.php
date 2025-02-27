@@ -17,10 +17,9 @@ class Base
     protected $openid = '';
     protected $userInfo = [];
     protected $request = null;
-    
+
     public function __construct()
     {
-        die('oop');
         $this->request = Request::instance();
         $this->init();
 
@@ -28,28 +27,28 @@ class Base
         if (!in_array(self::$userEnv, self::WX_MINI_APP)) {
             exit(json_encode($this->outputData(301, 'env error')));
         }
-        
+
         // 通用参数校验
         if (strlen($this->request->param('openid')) != 28) {
             exit(json_encode($this->outputData(301, '请登录')));
         }
-        
+
         $this->openid = $this->request->param('openid');
-         
+
     }
-    
-    /** 
+
+    /**
      * 获取用户基本信息
      * @return array $userInfo
      */
     protected function getUserBaseInfo()
-    {   
+    {
         $where = ['openid' => $this->openid];
         $this->userInfo = $this->userAccountEntity->getUserInfo($where, ['id', 'openid']);
-        
+
         return $this->userInfo;
     }
-    
+
     /**
      * 初始化相关数据
      */
@@ -58,9 +57,9 @@ class Base
         $this->setUserEnv();
         $this->userAccountEntity = new UserAccount();
     }
-    
+
     /**
-     * 设置当前用户环境 
+     * 设置当前用户环境
      */
     private function setUserEnv()
     {
@@ -70,7 +69,7 @@ class Base
             self::$userEnv = 'apizza';
         }
     }
-    
+
     /**
      * 检测用户，若不存在，直接输出
      */
@@ -81,10 +80,10 @@ class Base
             exit(json_encode($this->outputData(400, 'user error')));
         }
     }
-    
+
     /**
      * 接口数据输出
-     * 
+     *
      */
     public function outputData(int $code = 200, string $msg = 'success', array $data = [])
     {
@@ -94,6 +93,6 @@ class Base
             'data' => $data
         ];
     }
-    
+
 
 }
