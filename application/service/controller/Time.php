@@ -34,8 +34,7 @@ class Time
      */
     public static function todayDate(string $delimiter = '')
     {
-        $today = date('d');
-        return date('Y')."{$delimiter}".date('m')."{$delimiter}{$today}";
+        return date("Y{$delimiter}m{$delimiter}d");
     }
 
     /**
@@ -59,10 +58,7 @@ class Time
      */
     public static function yesterdayDate(string $delimiter = '')
     {
-        $yestoday = date('d')-1;
-        $yestoday = strlen($yestoday) > 1 ? $yestoday : '0'.$yestoday;
-        
-        return date('Y')."{$delimiter}".date('m')."{$delimiter}{$yestoday}";
+        return date("Y{$delimiter}m{$delimiter}d", strtotime("-1 day"));
     }
 
     /**
@@ -98,7 +94,7 @@ class Time
         } else {
             $start_week = "-1 week Monday";
         }
-        
+
         return [
             date("Y{$delimiter}m{$delimiter}d", strtotime($start_week, $timestamp)),
             date("Y{$delimiter}m{$delimiter}d", strtotime("+0 week Sunday", $timestamp) + 24 * 3600 - 1)
@@ -202,7 +198,7 @@ class Time
      */
     public static function lastMonth(string $delimiter = '')
     {
-        return date("Y{$delimiter}m")-1;
+        return date("Y{$delimiter}m", strtotime("first day of last month"));
     }
     
     /**
