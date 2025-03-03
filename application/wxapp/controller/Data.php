@@ -22,6 +22,7 @@ class Data extends Base
     public function __construct()
     {
         parent::__construct();
+
         $this->checkUser();
         $this->init();
     }

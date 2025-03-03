@@ -11,7 +11,7 @@ use app\wxapp\model\UserAccount;
 
 class Base
 {
-    protected const WX_MINI_APP = ['apizza', 'wechat'];
+    protected const WX_MINI_APP = ['apizza', 'wechat', 'postman'];
     protected static $userEnv = '';
     protected $userAccountEntity = null;
     protected $openid = '';
@@ -67,6 +67,8 @@ class Base
             self::$userEnv = 'wechat';
         } else if (substr_count(strtolower($this->request->header('user-agent')), 'apizza')) {
             self::$userEnv = 'apizza';
+        } else if (substr_count(strtolower($this->request->header('user-agent')), 'postman')) {
+            self::$userEnv = 'postman';
         }
     }
     

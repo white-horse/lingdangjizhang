@@ -14,13 +14,13 @@ return [
         // 数据库类型
         'type'            => 'mysql',
         // 服务器地址
-        'hostname'        => '132.232.39.231',
+        'hostname'        => 'localhost',
         // 数据库名
         'database'        => 'lingdang_bill',
         // 用户名
         'username'        => 'jerry',
         // 密码
-        'password'        => 'jerry-009',
+        'password'        => 'Sy~0#01&8J,erry',
         // 端口
         'hostport'        => '3306',
         // 连接dsn
