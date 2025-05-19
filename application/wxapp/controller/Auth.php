@@ -27,6 +27,13 @@ class Auth
                    .Config::get('wxapp.app_secret').'&js_code='.$code.'&grant_type=authorization_code';
             
             $res = json_decode(curl_get($url), true);
+
+$trace_info = [
+    'res' => $res,
+    'code' => $code,
+    'url' => $url
+];
+            trace($trace_info, 'info');
             if (isset($res['openid'])) {
                 self::$output['data']['openid'] = $res['openid'];
                 self::$output['data']['session_key'] = $res['session_key'];
